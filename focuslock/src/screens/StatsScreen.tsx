@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { VictoryAxis, VictoryBar, VictoryChart, VictoryTheme } from 'victory-native';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { GlassCard } from '../components/GlassCard';
 import { PillToggle } from '../components/PillToggle';
 import { AppIcon } from '../components/AppIcon';
+import { SvgBarChart } from '../components/SvgBarChart';
 import { Colors, Radius, Spacing } from '../theme';
 import { SampleApps } from '../data/sampleApps';
 import { StatsRange, useAppStore } from '../store/useAppStore';
@@ -65,38 +65,7 @@ export function StatsScreen({ navigation }: any) {
 
         <View style={{ height: 14 }} />
         <GlassCard intensity={34}>
-          <VictoryChart
-            theme={VictoryTheme.material}
-            height={240}
-            padding={{ top: 20, bottom: 40, left: 46, right: 16 }}
-            domainPadding={{ x: 16 }}
-          >
-            <VictoryAxis
-              style={{
-                axis: { stroke: 'rgba(255,255,255,0.12)' },
-                tickLabels: { fill: 'rgba(255,255,255,0.55)', fontSize: 10 },
-                grid: { stroke: 'rgba(255,255,255,0.06)' },
-              }}
-            />
-            <VictoryAxis
-              dependentAxis
-              style={{
-                axis: { stroke: 'rgba(255,255,255,0.12)' },
-                tickLabels: { fill: 'rgba(255,255,255,0.55)', fontSize: 10 },
-                grid: { stroke: 'rgba(255,255,255,0.06)' },
-              }}
-            />
-            <VictoryBar
-              data={series}
-              x="label"
-              y="hours"
-              style={{
-                data: { fill: Colors.blue, opacity: 0.85 },
-              }}
-              cornerRadius={{ top: 6, bottom: 0 }}
-              barWidth={14}
-            />
-          </VictoryChart>
+          <SvgBarChart data={series} height={240} />
         </GlassCard>
 
         <View style={{ height: 16 }} />
