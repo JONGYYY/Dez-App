@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "FocusLock",
+    "slug": "focuslock",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#060B14"
+    },
+    "plugins": [
+      "./app.plugin.js"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.focuslock.app",
+      "infoPlist": {
+        "NSFamilyControlsUsageDescription": "FocusLock needs access to Family Controls to block distracting apps and help you stay focused.",
+        "NSDeviceActivityUsageDescription": "FocusLock uses Device Activity monitoring to track app usage and enforce focus sessions."
+      }
+    },
+    "android": {
+      "package": "com.focuslock.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#060B14"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.PACKAGE_USAGE_STATS",
+        "android.permission.QUERY_ALL_PACKAGES",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WAKE_LOCK"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "questionApiUrl": "https://api.example.com/sat-questions"
+    }
+  }
+}
