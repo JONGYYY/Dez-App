@@ -106,66 +106,6 @@ export function StatsScreen({ navigation }: any) {
       cancelled = true;
     };
   }, [range, selectedAppIds]);
-  
-  // Removed loadOSScreenTimeData function - moved inline to useEffect
-    setIsLoadingStats(true);
-    try {
-      const selectedIds = Object.entries(selectedAppIds)
-        .filter(([, selected]) => selected)
-        .map(([appId]) => appId);
-      
-      if (selectedIds.length === 0) {
-        setOsScreenTimeData([]);
-        setIsLoadingStats(false);
-        return;
-      }
-      
-      // Calculate date range based on selected range
-      const endDate = new Date();
-      const startDate = new Date();
-      
-      if (range === 'today') {
-        startDate.setHours(0, 0, 0, 0);
-      } else if (range === 'week') {
-        startDate.setDate(endDate.getDate() - 7);
-      } else if (range === 'month') {
-        startDate.setDate(endDate.getDate() - 30);
-      }
-      
-      const screenTimeData = await getScreenTimeData({
-        appIds: selectedIds,
-        startDate,
-        endDate,
-      });
-      
-      // Convert to AppUsage format
-      const usageMap = new Map<string, number>();
-      
-      screenTimeData.forEach((data) => {
-        const existing = usageMap.get(data.appId) || 0;
-        usageMap.set(data.appId, existing + data.minutes);
-      });
-      
-      // Calculate average per day
-      const days = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
-      
-      const appUsage: AppUsage[] = Array.from(usageMap.entries()).map(([appId, totalMinutes]) => ({
-        appId,
-        minutesPerDay: totalMinutes / days,
-      }));
-      
-      // Sort by usage descending
-      appUsage.sort((a, b) => b.minutesPerDay - a.minutesPerDay);
-      
-      setOsScreenTimeData(appUsage);
-    } catch (error) {
-      console.warn('Failed to load OS screen time data:', error);
-      // Fallback to existing topApps from store
-      setOsScreenTimeData([]);
-    } finally {
-      setIsLoadingStats(false);
-    }
-  }
 
   const series = useMemo(() => {
     // If we have OS data, use it; otherwise fallback to mock data
