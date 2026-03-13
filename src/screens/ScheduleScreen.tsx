@@ -35,6 +35,16 @@ export function ScheduleScreen({ navigation }: any) {
   const hasReachedLimit = schedules.length >= FREE_SCHEDULE_LIMIT;
   const remainingSchedules = Math.max(0, FREE_SCHEDULE_LIMIT - schedules.length);
 
+  React.useEffect(() => {
+    console.log('Schedule Debug:', {
+      scheduleCount: schedules.length,
+      limit: FREE_SCHEDULE_LIMIT,
+      hasReachedLimit,
+      remainingSchedules,
+      shouldShowWarning: hasReachedLimit || remainingSchedules === 1,
+    });
+  }, [schedules.length, hasReachedLimit, remainingSchedules]);
+
   const appLabel = selectedIds.length
     ? selectedIds.map((id) => SampleApps.find((a) => a.id === id)?.name ?? id).slice(0, 2).join(', ') + (selectedIds.length > 2 ? '…' : '')
     : 'Choose apps on Lock tab';
@@ -42,7 +52,7 @@ export function ScheduleScreen({ navigation }: any) {
   function saveSchedule() {
     if (selectedIds.length === 0) return;
     if (hasReachedLimit) {
-      navigation.navigate('Pricing');
+      navigation.getParent()?.navigate('Pricing');
       return;
     }
     upsertSchedule({
@@ -59,6 +69,12 @@ export function ScheduleScreen({ navigation }: any) {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Daily Schedule</Text>
+          <Pressable
+            onPress={() => navigation.getParent()?.navigate('Pricing')}
+            style={({ pressed }) => [styles.upgradeHeaderBtn, pressed && { opacity: 0.8 }]}
+          >
+            <Ionicons name="diamond-outline" size={18} color={Colors.blue} />
+          </Pressable>
         </View>
 
         <Text style={styles.sectionTitle}>Block Schedule</Text>
@@ -76,7 +92,7 @@ export function ScheduleScreen({ navigation }: any) {
               </Text>
             </View>
             <Pressable
-              onPress={() => navigation.navigate('Pricing')}
+              onPress={() => navigation.getParent()?.navigate('Pricing')}
               style={({ pressed }) => [styles.upgradeBtn, pressed && { opacity: 0.8 }]}
             >
               <Text style={styles.upgradeBtnText}>View Plans →</Text>
@@ -183,8 +199,23 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
     paddingBottom: 110,
   },
-  header: { marginBottom: 18 },
+  header: { 
+    marginBottom: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   headerTitle: { color: Colors.text, fontSize: 26, fontWeight: '800' },
+  upgradeHeaderBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(74,141,255,0.3)',
+    backgroundColor: 'rgba(74,141,255,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   sectionTitle: {
     marginTop: 10,
     marginBottom: 10,
