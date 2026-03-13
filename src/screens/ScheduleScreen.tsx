@@ -64,12 +64,12 @@ export function ScheduleScreen({ navigation }: any) {
         <Text style={styles.sectionTitle}>Block Schedule</Text>
         
         {/* Schedule limit warning */}
-        {remainingSchedules <= 1 && (
+        {(hasReachedLimit || remainingSchedules === 1) && (
           <GlassCard intensity={28} style={styles.limitCard}>
             <View style={styles.limitRow}>
               <Ionicons name="warning-outline" size={18} color={Colors.blue} />
               <Text style={styles.limitText}>
-                {remainingSchedules === 0
+                {hasReachedLimit
                   ? 'Schedule limit reached. '
                   : `${remainingSchedules} schedule remaining. `}
                 <Text style={styles.limitLink}>Upgrade to Pro</Text> for unlimited schedules.
