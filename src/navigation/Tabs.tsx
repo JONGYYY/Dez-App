@@ -2,12 +2,14 @@ import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../theme';
 import { LockScreen } from '../screens/LockScreen';
 import { StatsScreen } from '../screens/StatsScreen';
 import { ScheduleScreen } from '../screens/ScheduleScreen';
+import { PricingScreen } from '../screens/PricingScreen';
 
 export type RootTabsParamList = {
   Lock: { preselectAppId?: string } | undefined;
@@ -15,7 +17,39 @@ export type RootTabsParamList = {
   Schedule: undefined;
 };
 
+export type RootStackParamList = {
+  MainTabs: undefined;
+  Pricing: undefined;
+};
+
 const Tab = createBottomTabNavigator<RootTabsParamList>();
+const Stack = createStackNavigator<RootStackParamList>();
+
+function MainTabs() {
+  return (
+    <Tab.Navigator
+      initialRouteName="Lock"
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: Colors.blue,
+        tabBarInactiveTintColor: 'rgba(255,255,255,0.45)',
+        tabBarStyle: styles.tabBar,
+        tabBarBackground: () => <TabBarBackground />,
+        tabBarIcon: ({ color, focused, size }) => {
+          const s = size ?? 22;
+          if (route.name === 'Lock') return <Ionicons name={focused ? 'lock-closed' : 'lock-closed-outline'} size={s} color={color} />;
+          if (route.name === 'Stats') return <Ionicons name={focused ? 'stats-chart' : 'stats-chart-outline'} size={s} color={color} />;
+          return <Ionicons name={focused ? 'calendar' : 'calendar-outline'} size={s} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Lock" component={LockScreen} />
+      <Tab.Screen name="Stats" component={StatsScreen} />
+      <Tab.Screen name="Schedule" component={ScheduleScreen} />
+    </Tab.Navigator>
+  );
+}
 
 function TabBarBackground() {
   if (Platform.OS === 'web') return <View style={styles.bgFallback} />;
@@ -25,27 +59,22 @@ function TabBarBackground() {
 export function Tabs() {
   return (
     <NavigationContainer>
-      <Tab.Navigator
-        initialRouteName="Lock"
-        screenOptions={({ route }) => ({
+      <Stack.Navigator
+        screenOptions={{
           headerShown: false,
-          tabBarShowLabel: false,
-          tabBarActiveTintColor: Colors.blue,
-          tabBarInactiveTintColor: 'rgba(255,255,255,0.45)',
-          tabBarStyle: styles.tabBar,
-          tabBarBackground: () => <TabBarBackground />,
-          tabBarIcon: ({ color, focused, size }) => {
-            const s = size ?? 22;
-            if (route.name === 'Lock') return <Ionicons name={focused ? 'lock-closed' : 'lock-closed-outline'} size={s} color={color} />;
-            if (route.name === 'Stats') return <Ionicons name={focused ? 'stats-chart' : 'stats-chart-outline'} size={s} color={color} />;
-            return <Ionicons name={focused ? 'calendar' : 'calendar-outline'} size={s} color={color} />;
-          },
-        })}
+          presentation: 'modal',
+          cardStyle: { backgroundColor: 'transparent' },
+        }}
       >
-        <Tab.Screen name="Lock" component={LockScreen} />
-        <Tab.Screen name="Stats" component={StatsScreen} />
-        <Tab.Screen name="Schedule" component={ScheduleScreen} />
-      </Tab.Navigator>
+        <Stack.Screen name="MainTabs" component={MainTabs} />
+        <Stack.Screen 
+          name="Pricing" 
+          component={PricingScreen}
+          options={{
+            presentation: 'card',
+          }}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }

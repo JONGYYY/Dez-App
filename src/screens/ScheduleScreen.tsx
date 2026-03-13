@@ -16,7 +16,9 @@ function minutesToDate(mins: number) {
   return d;
 }
 
-export function ScheduleScreen() {
+const FREE_SCHEDULE_LIMIT = 3;
+
+export function ScheduleScreen({ navigation }: any) {
   const selectedAppIds = useAppStore((s) => s.selectedAppIds);
   const schedules = useAppStore((s) => s.schedules);
   const upsertSchedule = useAppStore((s) => s.upsertSchedule);
@@ -29,12 +31,20 @@ export function ScheduleScreen() {
 
   const [pickerOpen, setPickerOpen] = useState<'start' | 'end' | null>(null);
 
+  // Check if user has reached schedule limit (free tier)
+  const hasReachedLimit = schedules.length >= FREE_SCHEDULE_LIMIT;
+  const remainingSchedules = Math.max(0, FREE_SCHEDULE_LIMIT - schedules.length);
+
   const appLabel = selectedIds.length
     ? selectedIds.map((id) => SampleApps.find((a) => a.id === id)?.name ?? id).slice(0, 2).join(', ') + (selectedIds.length > 2 ? '…' : '')
     : 'Choose apps on Lock tab';
 
   function saveSchedule() {
     if (selectedIds.length === 0) return;
+    if (hasReachedLimit) {
+      navigation.navigate('Pricing');
+      return;
+    }
     upsertSchedule({
       appIds: selectedIds,
       startMinutes: startMins,
@@ -52,6 +62,28 @@ export function ScheduleScreen() {
         </View>
 
         <Text style={styles.sectionTitle}>Block Schedule</Text>
+        
+        {/* Schedule limit warning */}
+        {remainingSchedules <= 1 && (
+          <GlassCard intensity={28} style={styles.limitCard}>
+            <View style={styles.limitRow}>
+              <Ionicons name="warning-outline" size={18} color={Colors.blue} />
+              <Text style={styles.limitText}>
+                {remainingSchedules === 0
+                  ? 'Schedule limit reached. '
+                  : `${remainingSchedules} schedule remaining. `}
+                <Text style={styles.limitLink}>Upgrade to Pro</Text> for unlimited schedules.
+              </Text>
+            </View>
+            <Pressable
+              onPress={() => navigation.navigate('Pricing')}
+              style={({ pressed }) => [styles.upgradeBtn, pressed && { opacity: 0.8 }]}
+            >
+              <Text style={styles.upgradeBtnText}>View Plans →</Text>
+            </Pressable>
+          </GlassCard>
+        )}
+
         {schedules.length === 0 ? (
           <GlassCard intensity={30}>
             <Text style={styles.emptyTitle}>No schedules yet</Text>
@@ -209,6 +241,44 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   doneText: { color: Colors.blue, fontWeight: '900' },
+  
+  limitCard: {
+    marginBottom: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(74,141,255,0.3)',
+  },
+  limitRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 12,
+  },
+  limitText: {
+    flex: 1,
+    color: Colors.textDim,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '600',
+  },
+  limitLink: {
+    color: Colors.blue,
+    fontWeight: '800',
+  },
+  upgradeBtn: {
+    height: 42,
+    borderRadius: Radius.xl,
+    backgroundColor: 'rgba(74,141,255,0.20)',
+    borderWidth: 1,
+    borderColor: 'rgba(74,141,255,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  upgradeBtnText: {
+    color: Colors.blue,
+    fontSize: 14,
+    fontWeight: '800',
+  },
 });
 
 
